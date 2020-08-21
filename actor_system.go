@@ -268,11 +268,11 @@ func NewPid(system *ActorSystem, id int64) *Pid {
 // 3. 内部发送消息（有响应） - 重定向（由gs直接定向到gs) (msg != context)
 
 // 投递消息的工作流程
-func workflow(system *ActorSystem, target int64, net Response, localProcess func(),
+func workflow(system *ActorSystem, target int64, localProcess func(),
 	remote func(node string, _conn *grpc.ClientConn), errHandler func(_err error)) {
 
 	logrus.Debugf("workflow begin system(%s) target(%d) net(%v) localProcess(%v) redirect(%v) errHandler(%v)",
-		system.name, target, net, localProcess, remote, errHandler)
+		system.name, target, localProcess, remote, errHandler)
 
 	ref := system.Ref(target)
 	if ref == nil {
@@ -311,7 +311,7 @@ func (system *ActorSystem) checkRedirect(sender int64) error {
 func (system *ActorSystem) ask(sender, target int64, msg interface{}) (resp interface{}, err error) {
 	senderPid := system.NewPid(sender)
 	targetPid := system.NewPid(target)
-	workflow(system, target, nil, func() {
+	workflow(system, target, func() {
 		proxy := newProxyContext(system, senderPid, targetPid, msg, true, nil)
 		resp, err = proxy.request()
 	}, func(node string, _conn *grpc.ClientConn) {
@@ -325,7 +325,7 @@ func (system *ActorSystem) ask(sender, target int64, msg interface{}) (resp inte
 
 // 内部使用的消息投递，消息投递实际上是投递一个Context接口的实现
 func (system *ActorSystem) tell(sender, target int64, msg interface{}) (err error) {
-	workflow(system, target, nil, func() {
+	workflow(system, target, func() {
 		ref, _ := system.NewRef(target)
 		err = ref.pushMsg(msg)
 	}, func(node string, _conn *grpc.ClientConn) {
@@ -339,7 +339,7 @@ func (system *ActorSystem) tell(sender, target int64, msg interface{}) (err erro
 	return
 }
 
-// 同一个系统内发生请求操作
+// 发送消息带响应
 func (system *ActorSystem) Ask(sender, target int64, msg interface{}) (resp interface{}, err error) {
 	logrus.Debugf("Ask begin sender(%d) target(%d) msg(%v)", sender, target, msg)
 	if err := system.checkRedirect(sender); err != nil {

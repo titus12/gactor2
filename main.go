@@ -37,7 +37,8 @@ func buildPlayer(id int64) Handler {
 
 func main() {
 	actorSystem = NewActorSystem("game", buildPlayer,
-		actor.WithCluster(service),
+		//WithCluster(service),
 		WithTimeout(5*time.Minute))
+	actorSystem.Tell(100, 101)
 
 }
