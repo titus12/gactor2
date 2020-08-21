@@ -191,7 +191,7 @@ func WithAlarm(time time.Duration) systemOptFunc {
 }
 
 // 设置系统handler，如果不设置，则没有系统actor
-func WithHandler(handler Handler) systemOptFunc {
+func WithSystemHandler(handler Handler) systemOptFunc {
 	return func(s *ActorSystem) {
 		actorCtx, actorCancel := context.WithCancel(s.ctx)
 		s.systemActor = newActor(actorCtx, actorCancel, s, 0, handler)
