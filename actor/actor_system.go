@@ -310,6 +310,7 @@ func (system *ActorSystem) checkRedirect(sender int64) error {
 	return nil
 }
 
+// 内部使用的消息投递，消息投递实际上是投递一个Context接口的实现,带响应
 func (system *ActorSystem) ask(sender, target int64, msg interface{}) (resp interface{}, err error) {
 	senderPid := system.NewPid(sender)
 	targetPid := system.NewPid(target)
@@ -356,16 +357,4 @@ func (system *ActorSystem) Tell(sender, target int64, msg interface{}) error {
 		return err
 	}
 	return system.tell(sender, target, msg)
-	/*
-		switch v := msg.(type) {
-		case Context:
-			logrus.Debugf("Tell msg is Context sender: %d, target: %d, msg: %v", sender, target, msg)
-			return system.tell(sender, target, v)
-		case ProcessMsgFunc:
-			return errors.New("nonsupport ProcessMsgFunc type, need Ref type")
-		default:
-			logrus.Debugf("Tell ctx is defaultContext sender: %d, target: %d, msg: %v", sender, target, msg)
-			ctx := newDefaultContext(system.NewPid(sender), system.NewPid(target), system, msg, nil)
-			return system.tell(sender, target, ctx)
-		}*/
 }
