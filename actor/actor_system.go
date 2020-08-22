@@ -1,4 +1,4 @@
-package gactor2
+package actor
 
 import (
 	"context"
@@ -57,6 +57,8 @@ var (
 
 // 一个actor的方法消息，消息本身就是方法(只适应于本地调用)
 type ProcessMsgFunc func(self *Ref)
+
+//type HandlerFunc func(context.Context, interface{}) (interface{}, error)
 
 // 处理者，一个结构体实现这些接口方法，就是一个有效的actor
 type Handler interface {

@@ -1,7 +1,7 @@
-package gactor2
+package actor
 
 import (
-	"gactor/pb"
+	"gactor/actor/pb"
 	"sync"
 )
 

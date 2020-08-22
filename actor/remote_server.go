@@ -1,4 +1,4 @@
-package gactor2
+package actor
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc"
 )
 import (
-	"gactor/pb"
+	"gactor/actor/pb"
 )
 
 type remoteServiceImpl struct{}

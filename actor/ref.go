@@ -1,4 +1,4 @@
-package gactor2
+package actor
 
 import (
 	"context"
@@ -173,6 +173,14 @@ func (ref *Ref) start() {
 						fn(ref)
 					case Context: //信封消息(会包装消息之外的其他参数)
 						ref.handler.OnProcess(msg.(Context))
+						//ctx := msg.(Context)
+						/*fn,ok := ctx.Msg().(ProcessMsgFunc)
+						if ok {
+							req := fn(ref)
+							ctx.Write(xxxx)
+						}else{
+
+						}*/
 					default:
 						selfPid := ref.owner.NewPid(ref.id)
 						ctx := newDefaultContext(NoSender, selfPid, ref.owner, msg, nil)

@@ -1,4 +1,4 @@
-package gactor2
+package actor
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 import (
-	"gactor/pb"
+	"gactor/actor/pb"
 )
 
 // 用于响应的接口，凡实现此接口的用于接收actor的响应

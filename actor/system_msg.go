@@ -1,4 +1,4 @@
-package gactor2
+package actor
 
 // 定义系统消息, 实现此接口则为系统消息
 type SystemMessage interface {

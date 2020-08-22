@@ -1,4 +1,4 @@
-package gactor2
+package actor
 
 import "google.golang.org/grpc"
 

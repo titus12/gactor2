@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package testmsg;
+
+// 集群处于稳定
+// 控制台根据玩家id，通过与gameser一样的一致性哈希算法,直接命中节点，并向节点发送消息，让节点在本地执行
+// 必须保证senderId与targetId一定在本地节点上
+message LocalRun {
+    uint64 req_id = 1;          // 请求id(唯一，最后用于收集日志)
+    int64 sender_id = 2;        // 节点上发送者id
+    int64 target_id = 3;        // 节点上目标id
+    string content = 4;         //内容(节点打印的内容), actor打印的内容
+}
+
+message LocalRunResponse {
+    uint64 reply_id = 1;        // 根据请求id的回复，一般就是请求id
+}
+
+// 集群处于不稳定状态
+// 控制台拿到node_key所代表的节点
+// 1.确保node_key在集群中是running状态
+// 2.确保集群当前一定是超过1个以上的节点，并且有一个节点是处于Pending状态下
+message LocalRunPending {
+    uint64 req_id = 1;          // 请求id(唯一，最后用于收集日志)
+    int64 sender_id = 2;        // 节点上发送者id
+    int64 target_id = 3;        // 节点上目标id
+
+    string node_key = 4;    // 要把消息发到哪个节点上，节点的状态应该是running的
+}
+
+
+message RunMsg {
+    uint64 req_id = 1;
+    int64 target_id = 2;
+    string node_keys = 3;
+}
+
+message RunMsgResponse {
+    uint64 reply_id = 1;        // 根据请求id的回复，一般就是请求id
+    int64 target_id = 2;
+    string node_keys = 3;
+}
+
+message QueryMsg {
+    uint64 req_id = 1;
+    int64 target_id = 2;
+}
+
+message QueryMsgResponse {
+    uint64 reply_id = 1;        // 根据请求id的回复，一般就是请求id
+    int64 target_id = 2;
+    string node_name = 3;      // 存在的节点名称
+}
+
+
+service TestConsole {
+    // 控制台发出消息，让节点在本地执行，不需要actor有响应，但控制台消息本身需要有响应
+    rpc LocalRunRequest(LocalRun) returns (LocalRunResponse);
+
+    // 控制台发出消息, 节点可能在本地执行，可能转发，不需要actor有响应，但控制台消息本身需要有响应
+    rpc LocalRunPendingRequest(LocalRunPending) returns (LocalRunResponse);
+
+    // 发送执行消息，控制台只选择running状态的节点发送，并且每到一站都把当前nodename加入，并在最后一次返回
+    rpc RunMsgRequest(RunMsg) returns (RunMsgResponse);
+
+    // 查询actor，测试完用于检查actor的，确保在集群里不存在二个同样的actor
+    rpc QueryMsgRequest(QueryMsg) returns (QueryMsgResponse);
+}
